@@ -1,0 +1,8 @@
+Options -Indexes
+
+<FilesMatch "\.(txt|cfg|out|htaccess|htpasswd|ini|log|sh|bak|sql|json|xml|yml|yaml)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+ErrorDocument 404 /utils/404.php
