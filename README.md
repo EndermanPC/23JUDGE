@@ -44,7 +44,7 @@ Nếu host `23JUDGE` trên server khác, hãy cấu hình file `judge.bat` để
    - `Score.cfg`: Điểm của bài, được chia đều cho số lượng test. Ví dụ: `10`.
    - `ShowTest.cfg`: Cấu hình xem test (`true` hoặc `false`).
    - `StopWhenFail.cfg`: Dừng khi gặp lỗi (`true` hoặc `false`).
-   - `Problem.md`: Nội dung câu hỏi (markdown, hỗ trợ MathJax).
+   - `Problem.md`: Nội dung câu hỏi (Markdown, hỗ trợ MathJax).
 
 ### 3.1 Tạo test case:
 Tạo thư mục `tests` bên trong thư mục câu hỏi với cấu trúc:
@@ -58,6 +58,7 @@ tests/TEST1/input.txt
 tests/TEST1/output.txt
 tests/TEST2/input.txt
 tests/TEST2/output.txt
+...
 ```
 
 ## 4. Tạo Contest:
