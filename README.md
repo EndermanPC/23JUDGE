@@ -92,3 +92,8 @@ tests/TEST2/output.txt
 ### 6.2 Tài khoản có sẵn:
 - Tên tài khoản: `admin`
 - Mật khẩu: `itk23maidinh`
+
+## 7. Ảnh chụp màn hình:
+![image](https://github.com/user-attachments/assets/11e39e19-97dd-49ed-973d-ce2f54e76546)
+![image](https://github.com/user-attachments/assets/0257c678-0984-4c79-b1e3-ffb79d3d2e96)
+![image](https://github.com/user-attachments/assets/80c08d92-e5fe-42fc-83ce-5da86c18cd64)
