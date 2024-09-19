@@ -94,6 +94,7 @@ tests/TEST2/output.txt
 - Mật khẩu: `itk23maidinh`
 
 ## 7. Ảnh chụp màn hình:
-![image](https://github.com/user-attachments/assets/11e39e19-97dd-49ed-973d-ce2f54e76546)
 ![image](https://github.com/user-attachments/assets/0257c678-0984-4c79-b1e3-ffb79d3d2e96)
-![image](https://github.com/user-attachments/assets/80c08d92-e5fe-42fc-83ce-5da86c18cd64)
+![image](https://github.com/user-attachments/assets/5e4dc15b-ad45-4ffd-974c-305ff1025246)
+![image](https://github.com/user-attachments/assets/06a97331-3a1f-462b-9b78-702bc0dc94a0)
+
