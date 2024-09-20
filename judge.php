@@ -16,10 +16,10 @@ require 'utils/security.php';
 
 error_reporting(E_ERROR | E_PARSE);
 ini_set('upload_max_filesize', '64KB');
-ini_set('max_execution_time', 300);
 ini_set('precision', 3);
 
 ignore_user_abort(true);
+set_time_limit(0);
 
 $problem = filter_input(INPUT_POST, 'problem', FILTER_SANITIZE_STRING) ?? null;
 $name = isset($_COOKIE['username']) ? decrypt(htmlspecialchars($_COOKIE['username'])) : null;
@@ -94,7 +94,6 @@ function truncateText($text, $length = 150) {
     return substr($text, 0, $length) . '...';
 }
 
-
 function showResults($testResult, $timeExec, $memExec, $testPreview, $expectedOutput, $programOutput, $showTest) {
     if ($showTest) {  
         echo "<details class='w3-margin-bottom'>";
@@ -149,11 +148,6 @@ if ((($codeInput || $uploadedFile) && $problem && $name && isset($_POST['languag
     $StopWhenFailConfig = file_get_contents($configDir . "StopWhenFail.cfg");
     $StopWhenFail = filter_var($StopWhenFailConfig, FILTER_VALIDATE_BOOLEAN);
 
-    $apiUrl = "https://loving-awaited-mongoose.ngrok-free.app/submissions/";
-    $apiUrlCfg = "https://loving-awaited-mongoose.ngrok-free.app/submissions/?wait=false/";
-    
-    $languageId = $_POST['language'];
-
     $testDir = "problems" . DIRECTORY_SEPARATOR . basename($problem) . DIRECTORY_SEPARATOR . "tests";
     $testFolders = glob($testDir . DIRECTORY_SEPARATOR . "TEST*");
     natsort($testFolders);
@@ -172,7 +166,9 @@ if ((($codeInput || $uploadedFile) && $problem && $name && isset($_POST['languag
     $maxMem = 0;
     $scorePerTest = $ProblemScore / sizeof($testFolders);
     
-    $tokens = [];
+    $apiUrl = "https://loving-awaited-mongoose.ngrok-free.app/submissions/batch";
+    $languageId = $_POST['language'];
+    $submissions = [];
     
     if (!isset($viewSubmission)) {
         foreach ($testFolders as $testFolder) {
@@ -181,7 +177,7 @@ if ((($codeInput || $uploadedFile) && $problem && $name && isset($_POST['languag
             $inputData = file_get_contents($inputFile);
             $expectedOutput = file_get_contents($expectedOutputFile);
         
-            $submissionData = [
+            $submissions[] = [
                 "source_code" => $sourceCode,
                 "language_id" => $languageId,
                 "stdin" => $inputData,
@@ -190,39 +186,40 @@ if ((($codeInput || $uploadedFile) && $problem && $name && isset($_POST['languag
                 "cpu_extra_time" => 0.1,
                 "memory_limit" => $MemoryLimit,
             ];
+        }       
         
-            $options = [
-                'http' => [
-                    'header'  => "Content-type: application/json\r\n",
-                    'method'  => 'POST',
-                    'content' => json_encode($submissionData),
-                ],
-            ];
+        $options = [
+            'http' => [
+                'header'  => "Content-type: application/json\r\n",
+                'method'  => 'POST',
+                'content' => json_encode(["submissions" => $submissions]),
+            ],
+        ];
         
-            $context  = stream_context_create($options);
-            $response = @file_get_contents($apiUrlCfg, false, $context);
+        $context  = stream_context_create($options);
+        $response = @file_get_contents($apiUrl, false, $context);
         
-            if ($response === FALSE) {
-                die('<div class="w3-container w3-red w3-center w3-padding-large w3-round">Error: There are no active judges at this time.</div>');
-            }
+        if ($response === FALSE) {
+            die('<div class="w3-container w3-red w3-center w3-padding-large w3-round">Error: There are no active judges at this time.</div>');
+        }
+
+        $responseData = json_decode($response, true);
+        $tokens = array_column($responseData, 'token');
         
-            $responseData = json_decode($response, true);
-            $tokens[] = $responseData['token'];
-        }        
     } else {
         $tokensFile = file_get_contents($viewSubmission);
         $tokens = explode(",", $tokensFile);
     }
 
     foreach ($tokens as $index => $token) {
-        $resultUrl = "$apiUrl/$token";
-        
+        $resultUrl = "https://loving-awaited-mongoose.ngrok-free.app/submissions/$token";
+    
         do {
             sleep(1);
             $result = file_get_contents($resultUrl);
             $resultData = json_decode($result, true);
         } while ($resultData['status']['id'] == 1 || $resultData['status']['id'] == 2);
-        
+    
         $testFolder = $testFolders[$index];
         $inputFile = $testFolder . DIRECTORY_SEPARATOR . "input.txt";
         $expectedOutputFile = $testFolder . DIRECTORY_SEPARATOR . "output.txt";
@@ -232,7 +229,7 @@ if ((($codeInput || $uploadedFile) && $problem && $name && isset($_POST['languag
     
         $inputData = truncateText($inputData);
         $expectedOutput = truncateText($expectedOutput);
-        $programOutput = truncateText($programOutput);    
+        $programOutput = truncateText($programOutput);      
 
         if ($resultData['status']['id'] == 5) {
             showResults(basename($testFolder) . ": <span style='color:gray'>" . $resultData['status']['description'] . "</span>", $resultData['time'], $resultData['memory'], $inputData, $expectedOutput, $actualOutput, $ShowTest);
